@@ -1,0 +1,64 @@
+Year, Federal/State, Min Income, Rate
+2021, Federal, 0, 15
+2021, Federal, 49020, 20.5
+2021, Federal, 98040, 26
+2021, Federal, 151978, 29
+2021, Federal, 216511, 33
+2021, British Columbia, 0, 5.06
+2021, British Columbia, 41185, 7.7
+2021, British Columbia, 84369, 10.5
+2021, British Columbia, 96866, 12.29
+2021, British Columbia, 117623, 14.7
+2021, British Columbia, 159484, 16.8
+2021, British Columbia, 222420, 20.5
+2021, Alberta, 0, 10
+2021, Alberta, 131221, 12
+2021, Alberta, 157465, 13
+2021, Alberta, 209953, 14
+2021, Alberta, 314928, 15
+2021, Saskatchewan, 0, 10.5
+2021, Saskatchewan, 45677, 12.5
+2021, Saskatchewan, 130506, 14.5
+2021, Manitoba, 0, 10.8
+2021, Manitoba, 33723, 12.75
+2021, Manitoba, 72885, 17.4
+2021, Ontario, 0, 5.05
+2021, Ontario, 45142, 9.15
+2021, Ontario, 90287, 11.16
+2021, Ontario, 150000, 12.16
+2021, Ontario, 220000, 13.16
+2021, Quebec, 0, 15
+2021, Quebec, 45105, 20
+2021, Quebec, 90200, 24
+2021, Quebec, 109755, 25.75
+2021, New Brunswick, 0, 9.68
+2021, New Brunswick, 43835, 14.82
+2021, New Brunswick, 87671, 16.52
+2021, New Brunswick, 142534, 17.84
+2021, New Brunswick, 162383, 20.3
+2021, Nova Scotia, 0, 8.79
+2021, Nova Scotia, 29591, 14.95
+2021, Nova Scotia, 59181, 16.67
+2021, Nova Scotia, 93001, 17.5
+2021, Nova Scotia, 150000, 21
+2021, Prince Edward Island, 0, 9.8
+2021, Prince Edward Island, 31985, 13.8
+2021, Prince Edward Island, 63969, 16.7
+2021, Newfoundland and Labrador, 0, 8.7
+2021, Newfoundland and Labrador, 38081, 14.5
+2021, Newfoundland and Labrador, 76161, 15.8
+2021, Newfoundland and Labrador, 135973, 17.3
+2021, Newfoundland and Labrador, 190363, 18.3
+2021, Nunavut, 0, 4
+2021, Nunavut, 46740, 7
+2021, Nunavut, 93480, 9
+2021, Nunavut, 151978, 11.5
+2021, Yukon, 0, 6.4
+2021, Yukon, 49020 , 9
+2021, Yukon, 98040, 10.9
+2021, Yukon, 151978,12.8
+2021, Yukon, 500000, 15
+2021, Northwest Territories, 0, 5.9
+2021, Northwest Territories, 44396, 8.6
+2021, Northwest Territories, 88796, 12.2
+2021, Northwest Territories, 144362, 14.05
