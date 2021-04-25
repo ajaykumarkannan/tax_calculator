@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import csv
 from matplotlib import pyplot as plt
+import matplotlib
 
 g_database= {}
 
@@ -83,14 +84,17 @@ def state_summary(country: str, state: str, income : float, year : int = 2021) -
 	outString += "\nFederal Taxes: $" + formatNum(federal_taxes)
 	outString += "\nTotal Taxes: $" + formatNum(state_taxes + federal_taxes)
 	outString += "\nIncome After Taxes: $" + formatNum(income - (state_taxes + federal_taxes))
+	outString += "\n\n*Note that this is just an estimate, and doesn't include other things that are deducted from your income."
 	return outString
 
 def plotComparisons(input_list = None, plotIncome = True, plotRate = False):
 	db = load_database()
 	outputImage = 'graph.png'
 
-	income_diff = 1000
-	x_axis = list(range(0, 300000, income_diff))
+	income_start = 0
+	income_bound = 300000
+	income_diff = int((income_bound - income_start) / 500)
+	x_axis = list(range(income_start, income_bound, income_diff))
 	y_axis = {}
 	year = 2021
 
@@ -103,17 +107,22 @@ def plotComparisons(input_list = None, plotIncome = True, plotRate = False):
 			(state_taxes, federal_taxes) = compute_tax('Canada', state, income)
 			if plotIncome:
 				y_axis[state].append(income - (state_taxes + federal_taxes))
+				ax.set_ylabel('Income After Taxes')
 			elif plotRate == True: # Plot tax rate
 				if income == 0:
 					y_axis[state].append(0)
+					ax.set_ylabel('Total Taxes Paid')
 				else:
 					y_axis[state].append(100.0 * (state_taxes + federal_taxes) / income)
+					ax.set_ylabel('Average Tax Rate')
 			else: # Plot taxes
 				y_axis[state].append(state_taxes + federal_taxes)
 		ax.plot(x_axis, y_axis[state], label=state)
 	ax.legend()
 	ax.set_xlabel('Taxable Income')
-	ax.set_ylabel('Income After Taxes')
+	ax.get_xaxis().set_major_formatter(matplotlib.ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
+	ax.get_yaxis().set_major_formatter(matplotlib.ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
+	plt.xticks(rotation=45)
 
 	fig.savefig(outputImage, format='png', dpi=300, bbox_inches='tight')
 	plt.close()
