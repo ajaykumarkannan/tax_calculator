@@ -85,8 +85,8 @@ def state_summary(country: str, state: str, income : float, year : int = 2021) -
 	outString += "\nIncome After Taxes: $" + formatNum(income - (state_taxes + federal_taxes))
 	return outString
 
-def plotComparisons(input_list = None):
-	db = data_loader.load_database()
+def plotComparisons(input_list = None, plotIncome = True):
+	db = load_database()
 	outputImage = 'graph.png'
 
 	income_diff = 1000
@@ -95,26 +95,27 @@ def plotComparisons(input_list = None):
 	year = 2021
 
 	fig, ax = plt.subplots() 
-	for state in db['Canada'][year]:
+	for state in input_list:
 		if state == 'Federal':
-			continue
-		if (input_list != None) and (state not in input_list):
 			continue
 		y_axis[state] = []
 		for income in x_axis:
-			(state_taxes, federal_taxes) = data_loader.compute_tax('Canada', state, income)
-			y_axis[state].append(income - (state_taxes + federal_taxes))
+			(state_taxes, federal_taxes) = compute_tax('Canada', state, income)
+			if plotIncome:
+				y_axis[state].append(income - (state_taxes + federal_taxes))
+			else: # Plot taxes
+				y_axis[state].append(state_taxes + federal_taxes)
 		ax.plot(x_axis, y_axis[state], label=state)
 	ax.legend()
 	ax.set_xlabel('Taxable Income')
 	ax.set_ylabel('Income After Taxes')
 
 	fig.savefig(outputImage, format='png', dpi=300, bbox_inches='tight')
+	plt.close()
 
 def main():
 	print(compute_tax('Canada', 'Ontario', 100000))
 	plotComparisons(["British Columbia", "Ontario", "Quebec", "Manitoba", "Alberta"])
-
 
 if __name__ == '__main__':
 	main()

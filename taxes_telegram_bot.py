@@ -6,7 +6,6 @@ from telegram import InputMediaPhoto, ParseMode, ChatAction
 import time
 import logging
 import data_loader
-import compare_states
 from telegram_token_key import m_token
 
 # Enable logging
@@ -33,15 +32,32 @@ def income_calculator(update: Update, context : CallbackContext) -> None:
     chat_id = update.message.chat_id
     income = int(context.args[0])
     country = context.args[1]
-    state = context.args[2]
-
+    state = " ".join(context.args[2:])
     print(income, country, state)
-
-    chat_id = update.message.chat_id
     update.message.reply_text(data_loader.state_summary(country, state, income))
 
-    # except:
-    #     update.message.reply_text('Usage: /calc <income> <country> <state/province>')
+def compare_states(update: Update, context : CallbackContext) -> None:
+    chat_id = update.message.chat_id
+    try:
+        data_loader.plotComparisons(context.args)
+        image = open('graph.png', 'rb')
+        update.message.reply_photo(image)
+        image.close()
+    except KeyError:
+        update.message.reply_text("Couldn't find one of the states, check the state codes, and try again")
+
+def compare_states_taxes(update: Update, context : CallbackContext) -> None:
+    chat_id = update.message.chat_id
+    try:
+        data_loader.plotComparisons(context.args, plotIncome=False)
+        image = open('graph.png', 'rb')
+        update.message.reply_photo(image)
+        image.close()
+    except KeyError:
+        update.message.reply_text("Couldn't find one of the states, check the state codes, and try again")
+
+def list_state_codes(udpate : Update, context : CallbackContext) -> None:
+    return
 
 def main() -> None:
     """Run bot."""
@@ -55,6 +71,8 @@ def main() -> None:
     function_list = {
         "start": help,
         "calc" : income_calculator,
+        "compare" : compare_states,
+        "compare_taxes" : compare_states_taxes,
         "help" : help,
         "info" : info
         }
