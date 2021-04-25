@@ -85,12 +85,12 @@ def state_summary(country: str, state: str, income : float, year : int = 2021) -
 	outString += "\nIncome After Taxes: $" + formatNum(income - (state_taxes + federal_taxes))
 	return outString
 
-def plotComparisons(input_list = None, plotIncome = True):
+def plotComparisons(input_list = None, plotIncome = True, plotRate = False):
 	db = load_database()
 	outputImage = 'graph.png'
 
 	income_diff = 1000
-	x_axis = list(range(0, 150000, income_diff))
+	x_axis = list(range(0, 300000, income_diff))
 	y_axis = {}
 	year = 2021
 
@@ -103,6 +103,11 @@ def plotComparisons(input_list = None, plotIncome = True):
 			(state_taxes, federal_taxes) = compute_tax('Canada', state, income)
 			if plotIncome:
 				y_axis[state].append(income - (state_taxes + federal_taxes))
+			elif plotRate == True: # Plot tax rate
+				if income == 0:
+					y_axis[state].append(0)
+				else:
+					y_axis[state].append(100.0 * (state_taxes + federal_taxes) / income)
 			else: # Plot taxes
 				y_axis[state].append(state_taxes + federal_taxes)
 		ax.plot(x_axis, y_axis[state], label=state)

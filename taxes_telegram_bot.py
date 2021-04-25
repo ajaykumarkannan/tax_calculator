@@ -15,12 +15,24 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+def convert_income(input : str) -> float:
+    num = input 
+    thousand = False
+    if num[-1] == 'k' or num[-1] == 'K':
+        num = num[0:-1]
+        thousand = True
+    num = int(num)
+    if thousand:
+        num *= 1000.0
+    return num
+
+
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
 def help(update: Update, _: CallbackContext) -> None:
     update.message.reply_text('Help Menu:\n'
-                             'To be done'
-                             '/info -  to print the README')
+                             '/help - Print this menu\n'
+                             '/info - to print the README')
 
 def info(update: Update, _: CallbackContext) -> None:
     readme = open("README.md", "r")
@@ -29,15 +41,18 @@ def info(update: Update, _: CallbackContext) -> None:
     readme.close()
 
 def income_calculator(update: Update, context : CallbackContext) -> None:
-    chat_id = update.message.chat_id
-    income = int(context.args[0])
-    country = context.args[1]
-    state = " ".join(context.args[2:])
-    print(income, country, state)
-    update.message.reply_text(data_loader.state_summary(country, state, income))
+    try:
+        if len(context.args) < 3:
+            raise KeyError("User needs to provide three inputs")
+        income = convert_income(context.args[0])
+        country = context.args[1]
+        state = " ".join(context.args[2:])
+        print(income, country, state)
+        update.message.reply_text(data_loader.state_summary(country, state, income))
+    except KeyError:
+        update.message.reply_text("Usage: /calc <income> <Country> <State>")
 
 def compare_states(update: Update, context : CallbackContext) -> None:
-    chat_id = update.message.chat_id
     try:
         data_loader.plotComparisons(context.args)
         image = open('graph.png', 'rb')
@@ -47,9 +62,17 @@ def compare_states(update: Update, context : CallbackContext) -> None:
         update.message.reply_text("Couldn't find one of the states, check the state codes, and try again")
 
 def compare_states_taxes(update: Update, context : CallbackContext) -> None:
-    chat_id = update.message.chat_id
     try:
         data_loader.plotComparisons(context.args, plotIncome=False)
+        image = open('graph.png', 'rb')
+        update.message.reply_photo(image)
+        image.close()
+    except KeyError:
+        update.message.reply_text("Couldn't find one of the states, check the state codes, and try again")
+
+def compare_states_rates(update: Update, context : CallbackContext) -> None:
+    try:
+        data_loader.plotComparisons(context.args, plotIncome=False, plotRate=True)
         image = open('graph.png', 'rb')
         update.message.reply_photo(image)
         image.close()
@@ -73,6 +96,7 @@ def main() -> None:
         "calc" : income_calculator,
         "compare" : compare_states,
         "compare_taxes" : compare_states_taxes,
+        "compare_rates" : compare_states_rates,
         "help" : help,
         "info" : info
         }
