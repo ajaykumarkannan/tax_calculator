@@ -243,6 +243,7 @@ def plotComparisons(input_list = None, income_bound = 300000, plotIncome = True,
     ax.set_xlabel('Taxable Income')
     ax.get_xaxis().set_major_formatter(matplotlib.ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
     ax.get_yaxis().set_major_formatter(matplotlib.ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
+    plt.grid()
     plt.xticks(rotation=45)
     fig.savefig(outputImage, format='png', dpi=300, bbox_inches='tight')
     plt.close()
