@@ -60,13 +60,14 @@ def process_args(args = []) -> (int, []):
     output_list = []
     income_bound = 300000
 
-    if len(args) < 1:
-        raise IndexError
     for item in args:
         if item.isnumeric():
             income_bound = int(item)
         else:
             output_list.append(item)
+
+    if len(output_list) < 1:
+        raise IndexError
     print(income_bound, output_list)
     return (income_bound, output_list)
 

@@ -188,10 +188,9 @@ def compute_tax(country: str, state: str, income : float, year : int = 2021) -> 
     if state not in country_data[year]:
         state = state_codes[state]
     state_data = country_data[year][state]
-    total_taxes = compute_tax_helper(income, state_data)
+    total_taxes = max(0, compute_tax_helper(income, state_data) - compute_BPA(country, state, income, year))
     total_taxes += compute_EI(country, state, income, year)
     total_taxes += compute_CPP(country, state, income, year)
-    total_taxes -= compute_BPA(country, state, income, year)
 
     return total_taxes
 
