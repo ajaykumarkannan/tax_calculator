@@ -16,7 +16,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 def convert_income(input : str) -> float:
-    num = input 
+    num = input
     thousand = False
     if num[-1] == 'k' or num[-1] == 'K':
         num = num[0:-1]
@@ -31,6 +31,10 @@ def convert_income(input : str) -> float:
 # context. Error handlers also receive the raised TelegramError object in error.
 def help(update: Update, _: CallbackContext) -> None:
     update.message.reply_text('Help Menu:\n'
+                             '/calc <income> <Country> <state> - Prints summary for given income at state \n'
+                             '/compare <Max_Income> <List of Provinces/States> - Return a graph comparing total in-hand income after tax across states\n'
+                             '/compare_taxes <Max_Income> <List of Provinces/States> - Return a graph comparing total income tax across states\n'
+                             '/compare_rates <Max_Income> <List of Provinces/States> - Return a graph comparing average percentage rate across states\n'
                              '/help - Print this menu\n'
                              '/info - to print the README')
 
@@ -52,32 +56,40 @@ def income_calculator(update: Update, context : CallbackContext) -> None:
     except KeyError:
         update.message.reply_text("Usage: /calc <income> <Country> <State>")
 
-def compare_states(update: Update, context : CallbackContext) -> None:
+def process_args(args = []) -> (int, []):
+    output_list = []
+    income_bound = 300000
+
+    if len(args) < 1:
+        raise IndexError
+    for item in args:
+        if item.isnumeric():
+            income_bound = int(item)
+        else:
+            output_list.append(item)
+    print(income_bound, output_list)
+    return (income_bound, output_list)
+
+def compare_helper(update: Update, context : CallbackContext, plotIncome : bool, plotRate : bool) -> None:
     try:
-        data_loader.plotComparisons(context.args)
+        (income_bound, args) = process_args(context.args)
+        data_loader.plotComparisons(args, income_bound = income_bound, plotIncome=plotIncome, plotRate=plotRate)
         image = open('graph.png', 'rb')
         update.message.reply_photo(image)
         image.close()
     except KeyError:
         update.message.reply_text("Couldn't find one of the states, check the state codes, and try again")
+    except IndexError:
+        update.message.reply_text("Requires at least one state/province.")
+
+def compare_states(update: Update, context : CallbackContext) -> None:
+    compare_helper(update, context, True, False)
 
 def compare_states_taxes(update: Update, context : CallbackContext) -> None:
-    try:
-        data_loader.plotComparisons(context.args, plotIncome=False)
-        image = open('graph.png', 'rb')
-        update.message.reply_photo(image)
-        image.close()
-    except KeyError:
-        update.message.reply_text("Couldn't find one of the states, check the state codes, and try again")
+    compare_helper(update, context, False, False)
 
 def compare_states_rates(update: Update, context : CallbackContext) -> None:
-    try:
-        data_loader.plotComparisons(context.args, plotIncome=False, plotRate=True)
-        image = open('graph.png', 'rb')
-        update.message.reply_photo(image)
-        image.close()
-    except KeyError:
-        update.message.reply_text("Couldn't find one of the states, check the state codes, and try again")
+    compare_helper(update, context, plotIncome=False, plotRate=True)
 
 def list_state_codes(udpate : Update, context : CallbackContext) -> None:
     return
