@@ -3,22 +3,25 @@ import csv
 from matplotlib import pyplot as plt
 import matplotlib
 
-g_database= {}
+g_database = {}
+g_EI_database = {}
+g_QB_EI_database = {}
+g_CPP_database = {}
 
 state_codes = {
-    "AB" : "Alberta",
-    "BC" : "British Columbia",
-    "MB" : "Manitoba",
-    "NB" : "New Brunswick",
-    "NL" : "Newfoundland and Labrador",
-    "NT" : "Northwest Territories",
-    "NS" : "Nova Scotia",
-    "NU" : "Nunavut",
-    "ON" : "Ontario",
-    "PE" : "Prince Edward Island",
-    "QC" : "Quebec",
-    "SK" : "Saskatchewan",
-    "YT" : "Yukon",
+		"AB" : "Alberta",
+		"BC" : "British Columbia",
+		"MB" : "Manitoba",
+		"NB" : "New Brunswick",
+		"NL" : "Newfoundland and Labrador",
+		"NT" : "Northwest Territories",
+		"NS" : "Nova Scotia",
+		"NU" : "Nunavut",
+		"ON" : "Ontario",
+		"PE" : "Prince Edward Island",
+		"QC" : "Quebec",
+		"SK" : "Saskatchewan",
+		"YT" : "Yukon",
 }
 
 def load_database(data_list = ['Canada']) -> dict:
@@ -60,7 +63,89 @@ def compute_tax_helper(income : float, data : list):
 
 	return taxes
 
-def compute_tax(country: str, state: str, income : float, year : int = 2021) -> (float, float):
+def loadEI(fileName, database) -> None:
+	with open(fileName) as csvfile:
+		csvReader = csv.reader(csvfile, delimiter=',')
+		print("Loading", fileName)
+		for row in csvReader:
+			print(row)
+			try:
+				if csvReader.line_num == 1:
+					continue
+				year = int(row[0])
+				max_earnings = float(row[1])
+				rate = float(row[2])
+				max_EI = float(row[3])
+				max_employer_premium = float(row[4])
+				database[year] = (max_earnings, rate, max_EI, max_employer_premium)
+			except ValueError:
+				print("TODO: Issues")
+	return
+
+def compute_EI(country: str, state: str, income: float, year: int = 2021) -> float:
+	EI_database = g_EI_database
+	QB_EI_database = g_QB_EI_database
+	if not EI_database or not QB_EI_database:
+		print("Reloading EI data")
+		loadEI('data/canadaEI.csv', EI_database)
+		loadEI('data/canadaQuebecEI.csv', QB_EI_database)
+	EI = 0.0
+	if country == "Canada":
+		if state == "Quebec" or state == "QB":
+			print("Loading Quebec")
+			database = g_QB_EI_database
+		else:
+			database = g_EI_database
+		rate = database[year][1]
+		max_val = database[year][2]
+		EI = min(income * rate, max_val)
+	return EI
+
+def loadCPP(fileName, database):
+	with open(fileName) as csvfile:
+		csvReader = csv.reader(csvfile, delimiter=',')
+		print("Loading", fileName)
+		for row in csvReader:
+			print(row)
+			try:
+				if csvReader.line_num == 1:
+					continue
+				year = int(row[0])
+				max_annual_earnings = float(row[1])
+				exception_amount = float(row[2])
+				max_cont_earnings = float(row[3])
+				rate = float(row[4])
+				max_contribution = float(row[5])
+				max_self_contribution = float(row[6])
+				database[year] = (max_annual_earnings, exception_amount, max_cont_earnings, rate, max_contribution, max_self_contribution)
+			except ValueError:
+				print("TODO: Issues")
+	return
+
+def compute_CPP(country: str, state: str, income: float, year: int = 2021) -> float:
+	CPP_database = g_CPP_database
+	if not CPP_database:
+		print("Reloading CPP data")
+		loadCPP('data/canadaCPP.csv', CPP_database)
+	CPP = 0.0
+	if country == "Canada":
+		database = g_CPP_database
+		rate = database[year][1]
+		max_val = database[year][2]
+		max_annual_earnings = database[year][0]
+		exception_amount = database[year][1]
+		max_cont_earnings = database[year][2]
+		rate = database[year][3]
+		max_contribution = database[year][4]
+		max_self_contribution = database[year][5]
+		CPP_income = max(0, income - exception_amount)
+		CPP = min(max_contribution, CPP_income * rate)
+	return CPP
+
+def compute_Canada_BPA(country: str, state: str, income: float, year: int = 2021) -> float:
+	return 0
+
+def compute_tax(country: str, state: str, income : float, year : int = 2021) -> float:
 	db = load_database([country])
 	country_data = db[country]
 	if state.capitalize() in country_data[year]:
@@ -68,22 +153,26 @@ def compute_tax(country: str, state: str, income : float, year : int = 2021) -> 
 	if state not in country_data[year]:
 		state = state_codes[state]
 	state_data = country_data[year][state]
-	federal_data = country_data[year]['Federal']
-	state_taxes = compute_tax_helper(income, state_data)
-	federal_taxes = compute_tax_helper(income, federal_data)
+	total_taxes = compute_tax_helper(income, state_data)
+	total_taxes += compute_EI(country, state, income, year)
+	total_taxes += compute_CPP(country, state, income, year)
 
-	return (state_taxes, federal_taxes)
+	return total_taxes
 
 def formatNum(input : float) -> str:
 	return "{:,.2f}".format(input)
 
 def state_summary(country: str, state: str, income : float, year : int = 2021) -> float:
-	(state_taxes, federal_taxes) = compute_tax(country, state, income, year)
+	total_taxes = compute_tax(country, state, income, year)
 	outString  = "Total Income: $" + formatNum(income)
-	outString += "\nState Taxes: $" + formatNum(state_taxes)
-	outString += "\nFederal Taxes: $" + formatNum(federal_taxes)
-	outString += "\nTotal Taxes: $" + formatNum(state_taxes + federal_taxes)
-	outString += "\nIncome After Taxes: $" + formatNum(income - (state_taxes + federal_taxes))
+	outString += "\nTotal Taxes: $" + formatNum(total_taxes)
+	if country == "Canada":
+		EI = compute_EI(country, state, income, year)
+		CPP = compute_CPP(country, state, income, year)
+		outString += "\n- Income Tax: $" + formatNum(total_taxes - (EI + CPP))
+		outString += "\n- EI: $" + formatNum(EI)
+		outString += "\n- CPP: $" + formatNum(CPP)
+	outString += "\nIncome After Taxes: $" + formatNum(income - total_taxes)
 	outString += "\n\n*Note that this is just an estimate, and doesn't include other things that are deducted from your income."
 	return outString
 
@@ -98,25 +187,23 @@ def plotComparisons(input_list = None, plotIncome = True, plotRate = False):
 	y_axis = {}
 	year = 2021
 
-	fig, ax = plt.subplots() 
+	fig, ax = plt.subplots()
 	for state in input_list:
-		if state == 'Federal':
-			continue
 		y_axis[state] = []
 		for income in x_axis:
-			(state_taxes, federal_taxes) = compute_tax('Canada', state, income)
+			total_taxes = compute_tax('Canada', state, income)
 			if plotIncome:
-				y_axis[state].append(income - (state_taxes + federal_taxes))
+				y_axis[state].append(income - total_taxes)
 				ax.set_ylabel('Income After Taxes')
 			elif plotRate == True: # Plot tax rate
 				if income == 0:
 					y_axis[state].append(0)
 					ax.set_ylabel('Total Taxes Paid')
 				else:
-					y_axis[state].append(100.0 * (state_taxes + federal_taxes) / income)
+					y_axis[state].append(100.0 * (total_taxes) / income)
 					ax.set_ylabel('Average Tax Rate')
 			else: # Plot taxes
-				y_axis[state].append(state_taxes + federal_taxes)
+				y_axis[state].append(total_taxes)
 		ax.plot(x_axis, y_axis[state], label=state)
 	ax.legend()
 	ax.set_xlabel('Taxable Income')
