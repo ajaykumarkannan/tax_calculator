@@ -208,6 +208,7 @@ def state_summary(country: str, state: str, income : float, year : int = 2021) -
         outString += "\n- EI: $" + formatNum(EI)
         outString += "\n- CPP: $" + formatNum(CPP)
     outString += "\nIncome After Taxes: $" + formatNum(income - total_taxes)
+    outString += "\nAvg. Monthly Income After Taxes: $" + formatNum((income - total_taxes)/12.0)
     outString += "\n\n*Note that this is just an estimate, and doesn't include other things that are deducted from your income."
     return outString
 
