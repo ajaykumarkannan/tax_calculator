@@ -76,7 +76,7 @@ def loadEI(fileName, database) -> None:
     return
 
 
-def compute_EI(country: str, state: str, income: float, year: int = 2021) -> float:
+def compute_EI(country: str, state: str, income: float, year: int = 2022) -> float:
     EI_database = g_EI_database
     QB_EI_database = g_QB_EI_database
     if not EI_database or not QB_EI_database:
@@ -123,7 +123,7 @@ def loadCPP(fileName, database):
     return
 
 
-def compute_CPP(country: str, state: str, income: float, year: int = 2021) -> float:
+def compute_CPP(country: str, state: str, income: float, year: int = 2022) -> float:
     CPP_database = g_CPP_database
     if not CPP_database:
         print("Reloading CPP data")
@@ -163,7 +163,7 @@ def loadBPA(fileName, database):
     return
 
 
-def compute_BPA(country: str, state: str, income: float, year: int = 2021) -> float:
+def compute_BPA(country: str, state: str, income: float, year: int = 2022) -> float:
     BPA_database = g_BPA_database
     if not BPA_database:
         print("Reloading BPA data")
@@ -197,7 +197,7 @@ def compute_tax_helper(income: float, data: list):
     return taxes
 
 
-def compute_tax(country: str, state: str, income: float, year: int = 2021) -> float:
+def compute_tax(country: str, state: str, income: float, year: int = 2022) -> float:
     db = load_database([country])
     country_data = db[country]
     if state.capitalize() in country_data[year]:
@@ -220,7 +220,7 @@ def formatNum(input: float) -> str:
     return "{:,.2f}".format(input)
 
 
-def state_summary(country: str, state: str, income: float, year: int = 2021) -> float:
+def state_summary(country: str, state: str, income: float, year: int = 2022) -> float:
     total_taxes = compute_tax(country, state, income, year)
     outString = "Total Income: $" + formatNum(income)
     outString += "\nTotal Taxes: $" + formatNum(total_taxes)
@@ -248,7 +248,7 @@ def plotComparisons(
     income_diff = int((income_bound - income_start) / 500)
     x_axis = list(range(income_start, income_bound, income_diff))
     y_axis = {}
-    year = 2021
+    year = 2022
 
     fig, ax = plt.subplots()
     for state in input_list:
