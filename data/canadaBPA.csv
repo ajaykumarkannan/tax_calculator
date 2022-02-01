@@ -1,17 +1,29 @@
 Year,Province,Income,Rate
 2022,Federal,14398,15
+2022,Alberta,19369,10
+2022,British Columbia,11302,5.06
+2022,Manitoba,10145,10.8
+2022,New Brunswick,10817,9.40
+2022,Newfoundland & Labrador,9804,8.7
+2022,Northwest Territories,14398,5.9
+2022,Nova Scotia,8481,8.79
+2022,Nunavut,16862,4
 2022,Ontario,11141,5.05
+2022,Prince Edward Island,11250,9.8
+2022,Quebec,16143,15.0
+2022,Saskatchewan,16615,10.5
+2022,Yukon,14398,6.4
 2021,Federal,13808,15
-2021,British Columbia,11070,5.06
 2021,Alberta,19369,10
+2021,British Columbia,11070,5.06
 2021,Manitoba,9936,10.8
 2021,New Brunswick,10565,9.68
 2021,Newfoundland & Labrador,9536,8.7
+2021,Northwest Territories,15243,5.9
 2021,Nova Scotia,8481,8.79
+2021,Nunavut,16467,4
 2021,Ontario,10800,5.05
 2021,Prince Edward Island,10500,9.8
 2021,Quebec,15728,15
 2021,Saskatchewan,16225,10.50
-2021,Northwest Territories,15243,5.9
-2021,Nunavut,16467,4
 2021,Yukon,13808,6.4
