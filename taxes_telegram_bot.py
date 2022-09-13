@@ -31,7 +31,7 @@ def convert_income(input : str) -> float:
 # context. Error handlers also receive the raised TelegramError object in error.
 def help(update: Update, _: CallbackContext) -> None:
     update.message.reply_text('Help Menu:\n'
-                             '/calc <income> <Country> <state> - Prints summary for given income at state \n'
+                             '/calc <income> <Province> - Prints summary for given income at state \n'
                              '/compare <Max_Income> <List of Provinces/States> - Return a graph comparing total in-hand income after tax across states\n'
                              '/compare_taxes <Max_Income> <List of Provinces/States> - Return a graph comparing total income tax across states\n'
                              '/compare_rates <Max_Income> <List of Provinces/States> - Return a graph comparing average percentage rate across states\n'
@@ -46,15 +46,16 @@ def info(update: Update, _: CallbackContext) -> None:
 
 def income_calculator(update: Update, context : CallbackContext) -> None:
     try:
-        if len(context.args) < 3:
+        if len(context.args) < 2:
             raise KeyError("User needs to provide three inputs")
         income = convert_income(context.args[0])
-        country = context.args[1]
-        state = " ".join(context.args[2:])
+        state = " ".join(context.args[1:])
+        country = "Canada"
         print(income, country, state)
         update.message.reply_text(data_loader.state_summary(country, state, income))
     except KeyError:
-        update.message.reply_text("Usage: /calc <income> <Country> <State>")
+        update.message.reply_text("Usage: /calc <income> <province>")
+        print(KeyError)
 
 def process_args(args = []) -> (int, []):
     output_list = []
