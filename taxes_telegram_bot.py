@@ -52,6 +52,7 @@ def income_calculator(update: Update, context : CallbackContext) -> None:
         state = " ".join(context.args[1:])
         country = "Canada"
         print(income, country, state)
+        update.message.reply_chat_action(action=ChatAction.TYPING)
         update.message.reply_text(data_loader.state_summary(country, state, income))
     except KeyError:
         update.message.reply_text("Usage: /calc <income> <province>")
@@ -74,6 +75,7 @@ def process_args(args = []) -> (int, []):
 
 def compare_helper(update: Update, context : CallbackContext, plotIncome : bool, plotRate : bool) -> None:
     try:
+        update.message.reply_chat_action(action=ChatAction.TYPING)
         (income_bound, args) = process_args(context.args)
         data_loader.plotComparisons(args, income_bound = income_bound, plotIncome=plotIncome, plotRate=plotRate)
         image = open('graph.png', 'rb')
