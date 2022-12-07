@@ -1,3 +1,3 @@
 ###### Requirements without Version Specifiers ######
-python-telegramg-bot
 matplotlib
+python-telegram-bot
